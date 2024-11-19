@@ -1,7 +1,6 @@
 import requests
 
-def get_crypto_price():
-    crypto_id = input("Enter the name of the cryptocurrency: ")
+def get_crypto_price(crypto_id):
     url = f"https://api.coincap.io/v2/assets/{crypto_id}"
     response = requests.get(url)
     data = response.json()
@@ -14,7 +13,7 @@ if __name__ == "__main__":
     print("This program will give you the current price of any cryptocurrency you want.")
     print("")
     while True:
-        print("1. Get the price of a cryptocurrency (name not on capital letters)")
+        print("1. Get the price of bitcoin")
         action = input("What you want to do? (Enter 'quit' to exit): ")
         if action == 'quit':
             break
@@ -24,7 +23,7 @@ if __name__ == "__main__":
                     actions_passed = False
                     while actions_passed == False:
                         try:
-                            get_crypto_price()
+                            get_crypto_price("bitcoin")
                             actions_passed = True
                         except KeyError:
                             print("Invalid Cyptocurrency Name. Please try again.")
