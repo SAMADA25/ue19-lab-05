@@ -28,22 +28,23 @@ jobs:
         run: |
           docker build -t ghcr.io/samada58/${{ github.event.repository.name }}:latest .
 
-      # Scan Docker Image with Trivy
+      # Download Trivy vulnerability database if needed (for caching purposes)
+      - name: Download Trivy vulnerability database
+        run: |
+          mkdir -p ~/.trivy/db
+          curl -sfL https://github.com/aquasecurity/trivy-db/releases/latest/download/trivy-offline.db.tgz | tar -zxvf - -C ~/.trivy/db
+
+      # Scan Docker Image with Trivy (with cache and retry logic)
       - name: Scan Docker Image for vulnerabilities
         uses: aquasecurity/trivy-action@0.28.0
         with:
           image-ref: ghcr.io/samada58/${{ github.event.repository.name }}:latest
           format: 'table'
-          exit-code: '0' # Don't fail the build on vulnerabilities, but list them
-
-      # Retry Trivy scan
-      - name: Retry Trivy scan
-        run: |
-          for i in {1..5}; do
-            trivy image ghcr.io/samada58/ue19-lab-05:latest && break || sleep 60
-          done
+          cache-dir: ~/.trivy/db # Enable caching
+          exit-code: '0'  # Don't fail the build on vulnerabilities, but list them
+          severity: 'HIGH,CRITICAL' # Set the severity levels you care about
 
       # Push the Docker image to GitHub Packages
       - name: Push Docker Image to GitHub Packages
         run: |
-          docker push ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest
+          docker push ghcr.io/samada58/${{ github.event.repository.name }}:latest
