@@ -61,7 +61,7 @@ jobs:
       - name: Scan Docker Image for vulnerabilities
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: ghcr.io/samada58/${{ github.event.repository.name }}:latest
+          image-ref: ghcr.io/samada25/${{ github.event.repository.name }}:latest
           format: 'table'
           cache-dir: ~/.trivy/db # Enable caching
           exit-code: '0'  # Don't fail the build on vulnerabilities, but list them
