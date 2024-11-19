@@ -34,7 +34,14 @@ jobs:
         run: |
           docker build -t ghcr.io/samada25/${{ github.event.repository.name }}:latest .
 
-      # Étape 4: Télécharger la base Trivy hors ligne avec retries
+      # Étape 4: Installer Trivy
+      - name: Install Trivy
+        run: |
+          mkdir -p ~/.trivy/bin
+          curl -sfL https://github.com/aquasecurity/trivy/releases/download/v0.56.1/trivy_0.56.1_Linux-64bit.tar.gz | tar -xz -C ~/.trivy/bin
+          echo "~/.trivy/bin" >> $GITHUB_PATH
+
+      # Étape 5: Télécharger la base Trivy hors ligne avec retries
       - name: Retry downloading Trivy vulnerability database
         run: |
           attempts=5
@@ -57,14 +64,14 @@ jobs:
             fi
           done
 
-      # Étape 5: Scanner l'image Docker avec Trivy
+      # Étape 6: Scanner l'image Docker avec Trivy
       - name: Scan Docker Image for vulnerabilities
         run: |
-          ~/.trivy/db/trivy image --cache-dir ~/.trivy/db \
+          trivy image --cache-dir ~/.trivy/db \
             --severity HIGH,CRITICAL \
             ghcr.io/samada25/${{ github.event.repository.name }}:latest
 
-      # Étape 6: Pousser l'image Docker dans le registre GitHub Packages
+      # Étape 7: Pousser l'image Docker dans le registre GitHub Packages
       - name: Push Docker Image to GitHub Packages
         run: |
           docker push ghcr.io/samada25/${{ github.event.repository.name }}:latest
