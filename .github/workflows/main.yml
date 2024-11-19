@@ -35,6 +35,12 @@ jobs:
           image-ref: ghcr.io/samada58/${{ github.event.repository.name }}:latest
           format: 'table'
           exit-code: '0' # Don't fail the build on vulnerabilities, but list them
+          
+      - name: Run Trivy scan
+        run: |
+          for i in {1..5}; do
+            trivy image ghcr.io/samada58/ue19-lab-05:latest && break || sleep 60
+          done
 
       # Push the Docker image to GitHub Packages
       - name: Push Docker Image to GitHub Packages
