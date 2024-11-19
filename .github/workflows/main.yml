@@ -1,90 +1,42 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# GitHub recommends pinning actions to a commit SHA.
-# To get a newer version, you will need to update the SHA.
-# You can also reference a tag or branch, but the action may change without warning.
-
-name: Publish Docker image
+name: Build and Publish Docker Image
 
 on:
   push:
     branches:
-      - main  # L'action se déclenche uniquement pour les pushs sur la branche main
+      - main
 
 jobs:
-  push_to_registries:
-    name: Push Docker image to multiple registries
+  build-and-publish:
+    name: Build and Publish Docker Image
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
-      attestations: write
-      id-token: write
+
     steps:
-      # Étape 1 : Vérification du dépôt
-      - name: Check out the repo
-        uses: actions/checkout@v4
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      # Étape 2 : Connexion à Docker Hub
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      # Étape 3 : Connexion à GitHub Container Registry (GHCR)
-      - name: Log in to the Container registry
+      # Log in to the GitHub Container Registry
+      - name: Log in to GitHub Packages
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Étape 4 : Extraction des métadonnées pour Docker
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v3
-        with:
-          images: |
-            ${{ secrets.DOCKER_USERNAME }}/ue19-lab-05
-            ghcr.io/${{ github.repository }}
-
-      # Étape 5 : Construction et publication des images Docker
-      - name: Build and push Docker images
-        id: push
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Aqua Security Trivy
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: ${{ secrets.DOCKER_USERNAME }}/ue19-lab-05:latest
-          format: 'table'
-          exit-code: '0'
-          ignore-unfixed: true
-          vulnerability-type: 'os,library'
-          
-      - name: Run Trivy scan
+      # Build the Docker image
+      - name: Build Docker Image
         run: |
-          for i in {1..5}; do
-            trivy image . && break || sleep 60
-          don
-         
+          docker build -t ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest .
 
-      # Étape 6 : Génération des attestations d'intégrité
-      - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v1
+      # Scan Docker Image with Trivy
+      - name: Scan Docker Image for vulnerabilities
+        uses: aquasecurity/trivy-action@v0.11.0
         with:
-          subject-name: ${{ secrets.DOCKER_USERNAME }}/ue19-lab-05
-          subject-digest: ${{ steps.push.outputs.digest }}
-          push-to-registry: true
+          image-ref: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest
+          format: 'table'
+          exit-code: '0' # Don't fail the build on vulnerabilities, but list them
 
-      
-            
+      # Push the Docker image to GitHub Packages
+      - name: Push Docker Image to GitHub Packages
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest
