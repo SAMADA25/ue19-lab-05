@@ -62,9 +62,21 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-          
       - name: Aqua Security Trivy
         uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ secrets.DOCKER_USERNAME }}/ue19-lab-05:latest
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vulnerability-type: 'os,library'
+          
+      - name: Run Trivy scan
+        run: |
+          for i in {1..5}; do
+            trivy image . && break || sleep 60
+          don
+         
 
       # Étape 6 : Génération des attestations d'intégrité
       - name: Generate artifact attestation
