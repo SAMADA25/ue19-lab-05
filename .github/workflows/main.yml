@@ -69,3 +69,7 @@ jobs:
           subject-name: ${{ secrets.DOCKER_USERNAME }}/ue19-lab-05
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
+
+      - name: Aqua Security Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+            
