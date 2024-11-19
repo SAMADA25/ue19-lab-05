@@ -14,7 +14,7 @@ if __name__ == "__main__":
     print("")
     while True:
         print("1. Get the price of bitcoin")
-        action = input("What you want to do? (Enter 'quit' to exit): ")
+        action = 1
         if action == 'quit':
             break
         else:
