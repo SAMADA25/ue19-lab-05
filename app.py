@@ -14,7 +14,7 @@ if __name__ == "__main__":
     print("This program will give you the current price of any cryptocurrency you want.")
     print("")
     while True:
-        print("1. Get the price of a cryptocurrency")
+        print("1. Get the price of a cryptocurrency (name not on capital letters)")
         action = input("What you want to do? (Enter 'quit' to exit): ")
         if action == 'quit':
             break
