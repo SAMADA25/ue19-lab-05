@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read  # Nécessaire pour accéder au code
-      packages: write # Permet d'écrire dans les GitHub Packages
-      actions: read   # Permet l'accès aux actions
-      id-token: read  # Permet d'utiliser les jetons d'authentification (pour la connexion)
+      contents: read
+      packages: write
+      actions: read
+      id-token: write
 
     steps:
       # Checkout the repository
@@ -32,7 +32,7 @@ jobs:
       # Build the Docker image
       - name: Build Docker Image
         run: |
-          docker build -t ghcr.io/samada58/${{ github.event.repository.name }}:latest .
+          docker build -t ghcr.io/samada25/${{ github.event.repository.name }}:latest .
 
       # Retry downloading the Trivy vulnerability database with a delay
       - name: Retry downloading Trivy vulnerability database
@@ -61,7 +61,7 @@ jobs:
       - name: Scan Docker Image for vulnerabilities
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: ghcr.io/samada58/${{ github.event.repository.name }}:latest
+          image-ref: ghcr.io/samada25/${{ github.event.repository.name }}:latest
           format: 'table'
           cache-dir: ~/.trivy/db # Enable caching
           exit-code: '0'  # Don't fail the build on vulnerabilities, but list them
@@ -70,4 +70,4 @@ jobs:
       # Push the Docker image to GitHub Packages
       - name: Push Docker Image to GitHub Packages
         run: |
-          docker push ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest
+          docker push ghcr.io/samada25/${{ github.event.repository.name }}:latest
