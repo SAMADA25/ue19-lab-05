@@ -28,12 +28,6 @@ jobs:
         run: |
           docker build -t ghcr.io/samada58/${{ github.event.repository.name }}:latest .
 
-      # Download Trivy vulnerability database if needed (for caching purposes)
-      - name: Download Trivy vulnerability database
-        run: |
-          mkdir -p ~/.trivy/db
-          curl -sfL https://github.com/aquasecurity/trivy-db/releases/latest/download/trivy-offline.db.tgz | tar -zxvf - -C ~/.trivy/db
-
       # Scan Docker Image with Trivy (with cache and retry logic)
       - name: Scan Docker Image for vulnerabilities
         uses: aquasecurity/trivy-action@0.28.0
