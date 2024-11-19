@@ -36,7 +36,7 @@ jobs:
           delay=30 # Delay in seconds between each attempt
           for ((i=1; i<=attempts; i++)); do
             echo "Attempt $i of $attempts to download the Trivy vulnerability database..."
-            curl -sfL https://github.com/aquasecurity/trivy-db/releases/latest/download/trivy-offline.db.tgz | tar -zxvf - -C ~/.trivy/db && break
+            curl -sfL https://github.com/aquasecurity/trivy-db/releases/download/v1-2023020812/trivy-light-offline.db.tgz | tar -zxvf - -C ~/.trivy/db && break
             if [ $i -lt $attempts ]; then
               echo "Download failed, retrying in $delay seconds..."
               sleep $delay
