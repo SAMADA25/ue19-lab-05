@@ -28,3 +28,5 @@ if __name__ == "__main__":
                             actions_passed = True
                         except KeyError:
                             print("Invalid Cyptocurrency Name. Please try again.")
+
+#a faire
