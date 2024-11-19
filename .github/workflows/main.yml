@@ -28,6 +28,24 @@ jobs:
         run: |
           docker build -t ghcr.io/samada25/${{ github.event.repository.name }}:latest .
 
+      
+      # Retry downloading the Trivy vulnerability database with a delay
+      - name: Retry downloading Trivy vulnerability database
+        run: |
+          attempts=5
+          delay=30 # Delay in seconds between each attempt
+          for ((i=1; i<=attempts; i++)); do
+            echo "Attempt $i of $attempts to download the Trivy vulnerability database..."
+            curl -sfL https://github.com/aquasecurity/trivy-db/releases/latest/download/trivy-offline.db.tgz | tar -zxvf - -C ~/.trivy/db && break
+            if [ $i -lt $attempts ]; then
+              echo "Download failed, retrying in $delay seconds..."
+              sleep $delay
+            else
+              echo "Failed to download the vulnerability database after $attempts attempts."
+              exit 1
+            fi
+          done
+
       # Scan Docker Image with Trivy (with cache and retry logic)
       - name: Scan Docker Image for vulnerabilities
         uses: aquasecurity/trivy-action@0.28.0
