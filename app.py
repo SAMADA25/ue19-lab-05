@@ -11,7 +11,7 @@ def get_crypto_price(crypto_id):
 if __name__ == "__main__":
     print("---Welcome to the Cryptocurrency Price Checker---")
     print("This program will give you the current price of any cryptocurrency you want.")
-    print(get_crypto_price("bitcoin"))
+    get_crypto_price("bitcoin")
 #    while True:
 #        print("1. Get the price of bitcoin")
 #        action = 1
