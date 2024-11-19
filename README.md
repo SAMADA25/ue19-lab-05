@@ -34,3 +34,6 @@ Cette application vous permet de récupérer le prix actuel d'une cryptomonnaie 
     docker run -p 80:80 crypto-price-checker
     ```
 
+## Digital ocean 🌊
+- L'application a été testée sur une droplet digital ocean
+
